@@ -1579,6 +1579,19 @@ tok_get(struct tok_state *tok, char **p_start, char **p_end)
                 ahead_tok_kind = tok_get(&ahead_tok, &ahead_tok_start,
                                          &ahead_tok_end);
 
+                if (tok->buf != ahead_tok.buf)
+                {
+                    // tok->buf can be modified by tok_get (PyMem_REALLOC)
+                    tok->start = ahead_tok.buf + (tok->start - tok->buf);
+                    *p_start = tok->start;
+                    tok->cur = ahead_tok.buf + (tok->cur - tok->buf);
+                    *p_end = tok->cur;
+                    tok->inp = ahead_tok.buf + (tok->inp - tok->buf);
+                    tok->end = ahead_tok.buf + (tok->end - tok->buf);
+                    tok->line_start = ahead_tok.buf + (tok->line_start - tok->buf);
+                    tok->buf = ahead_tok.buf;
+                }
+
                 if (ahead_tok_kind == NAME
                     && ahead_tok.cur - ahead_tok.start == 3
                     && memcmp(ahead_tok.start, "def", 3) == 0)
