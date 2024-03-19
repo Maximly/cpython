@@ -1118,7 +1118,7 @@ compiler_add_o(struct compiler *c, PyObject *dict, PyObject *o)
     if (t == NULL)
         return -1;
 
-    v = PyDict_GetItem(dict, t);
+    v = PyDict_GetItemWithError(dict, t);
     if (!v) {
         if (PyErr_Occurred()) {
             Py_DECREF(t);
